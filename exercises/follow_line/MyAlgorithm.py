@@ -99,7 +99,10 @@ class MyAlgorithm(threading.Thread):
         mask = cv2.inRange(image, lower, upper)
         output = cv2.bitwise_and(image, image, mask = mask)
         # Add your code here
-        print "Runing"
+        if list(output[240, 320]) == [0,0,0]:
+            print "out of the line"
+        else:
+            print "Good way"
 
         #EXAMPLE OF HOW TO SEND INFORMATION TO THE ROBOT ACTUATORS
         #self.motors.sendV(10)
