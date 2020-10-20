@@ -88,15 +88,18 @@ class MyAlgorithm(threading.Thread):
         image = self.getImage()
 
         #Defining color boundaries
-        """
-        boundaries = [
-            ([17, 15, 100], [50, 56, 200]),
-            ([86, 31, 4], [220, 88, 50]),
-            ([25, 146, 190], [62, 174, 250]),
-            ([103, 86, 65], [145, 133, 128])
-        ]
-        """
-        print(type(image))
+        
+        boundaries = [([17, 15, 100], [50, 56, 200])]
+        
+        # loop over the boundaries
+        for (lower, upper) in boundaries:
+            # create NumPy arrays from the boundaries
+            lower = np.array(lower, dtype = "uint8")
+            upper = np.array(upper, dtype = "uint8")
+            # find the colors within the specified boundaries and apply
+            # the mask
+            mask = cv2.inRange(image, lower, upper)
+            output = cv2.bitwise_and(image, image, mask = mask)
         # Add your code here
         print "Runing"
 
@@ -105,4 +108,4 @@ class MyAlgorithm(threading.Thread):
         #self.motors.sendW(5)
 
         #SHOW THE FILTERED IMAGE ON THE GUI
-        self.set_threshold_image(image)
+        self.set_threshold_image(output)
