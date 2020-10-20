@@ -98,8 +98,17 @@ class MyAlgorithm(threading.Thread):
         # the mask
         mask = cv2.inRange(image, lower, upper)
         output = cv2.bitwise_and(image, image, mask = mask)
+        #output --> np.array len --> 480
+
         # Add your code here
-        print "Runing"
+        left_limit = list(output[240, 300])
+        right_limit = list(output[240, 340])
+        if left_limit == [0,0,0]:
+            print("turn RIGHT")
+        elif right_limit == [0,0,0]:
+            print("turn LEFT")
+        else:
+            print("GO ON!")
 
         #EXAMPLE OF HOW TO SEND INFORMATION TO THE ROBOT ACTUATORS
         #self.motors.sendV(10)
