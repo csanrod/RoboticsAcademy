@@ -87,12 +87,22 @@ class MyAlgorithm(threading.Thread):
         #GETTING THE IMAGES
         image = self.getImage()
 
+        #Defining color boundaries
+        """
+        boundaries = [
+            ([17, 15, 100], [50, 56, 200]),
+            ([86, 31, 4], [220, 88, 50]),
+            ([25, 146, 190], [62, 174, 250]),
+            ([103, 86, 65], [145, 133, 128])
+        ]
+        """
+        print(type(image))
         # Add your code here
         print "Runing"
 
         #EXAMPLE OF HOW TO SEND INFORMATION TO THE ROBOT ACTUATORS
-        self.motors.sendV(10)
-        self.motors.sendW(5)
+        #self.motors.sendV(10)
+        #self.motors.sendW(5)
 
         #SHOW THE FILTERED IMAGE ON THE GUI
         self.set_threshold_image(image)
