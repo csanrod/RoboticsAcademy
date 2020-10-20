@@ -89,17 +89,15 @@ class MyAlgorithm(threading.Thread):
 
         #Defining color boundaries
         
-        boundaries = [([17, 15, 100], [50, 56, 200])]
+        boundaries = ([0, 0, 0], [0, 0, 255])
         
-        # loop over the boundaries
-        for (lower, upper) in boundaries:
-            # create NumPy arrays from the boundaries
-            lower = np.array(lower, dtype = "uint8")
-            upper = np.array(upper, dtype = "uint8")
-            # find the colors within the specified boundaries and apply
-            # the mask
-            mask = cv2.inRange(image, lower, upper)
-            output = cv2.bitwise_and(image, image, mask = mask)
+        # create NumPy arrays from the boundaries
+        lower = np.array(boundaries[0], dtype = "uint8")
+        upper = np.array(boundaries[1], dtype = "uint8")
+        # find the colors within the specified boundaries and apply
+        # the mask
+        mask = cv2.inRange(image, lower, upper)
+        output = cv2.bitwise_and(image, image, mask = mask)
         # Add your code here
         print "Runing"
 
