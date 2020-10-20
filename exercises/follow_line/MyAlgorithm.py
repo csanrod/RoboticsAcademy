@@ -89,11 +89,11 @@ class MyAlgorithm(threading.Thread):
 
         #Defining color boundaries
         
-        boundaries = ([0, 0, 0], [0, 0, 255])
+        red = ([0, 0, 0], [200, 0, 255])
         
         # create NumPy arrays from the boundaries
-        lower = np.array(boundaries[0], dtype = "uint8")
-        upper = np.array(boundaries[1], dtype = "uint8")
+        lower = np.array(red[0], dtype = "uint8")
+        upper = np.array(red[1], dtype = "uint8")
         # find the colors within the specified boundaries and apply
         # the mask
         mask = cv2.inRange(image, lower, upper)
