@@ -84,35 +84,18 @@ class MyAlgorithm(threading.Thread):
         self.kill_event.set()
 
     def algorithm(self):
-        #GETTING THE IMAGES
         image = self.getImage()
 
-        #Defining color boundaries
-        
-        red = ([0, 0, 0], [200, 0, 255])
-        
-        # create NumPy arrays from the boundaries
-        lower = np.array(red[0], dtype = "uint8")
-        upper = np.array(red[1], dtype = "uint8")
-        # find the colors within the specified boundaries and apply
-        # the mask
-        mask = cv2.inRange(image, lower, upper)
+        #Convert RGB --> HSV
+        hsv_image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+
+        lower = np.array([0, 70, 50], dtype = "uint8")
+        upper = np.array([10, 255, 255], dtype = "uint8")
+
+        mask = cv2.inRange(hsv_image, lower, upper)
         output = cv2.bitwise_and(image, image, mask = mask)
-        #output --> np.array len --> 480
-
-        # Add your code here
-        left_limit = list(output[240, 300])
-        right_limit = list(output[240, 340])
-        if left_limit == [0,0,0]:
-            print("turn RIGHT")
-        elif right_limit == [0,0,0]:
-            print("turn LEFT")
-        else:
-            print("GO ON!")
-
-        #EXAMPLE OF HOW TO SEND INFORMATION TO THE ROBOT ACTUATORS
-        #self.motors.sendV(10)
-        #self.motors.sendW(5)
-
-        #SHOW THE FILTERED IMAGE ON THE GUI
+        
+        for row in range (340, 380):
+            output[row] = np.where(output[row]!=[0,0,0],[130,50,50],output[row])          
+        
         self.set_threshold_image(output)
