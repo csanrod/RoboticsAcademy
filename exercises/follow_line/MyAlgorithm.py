@@ -94,8 +94,47 @@ class MyAlgorithm(threading.Thread):
 
         mask = cv2.inRange(hsv_image, lower, upper)
         output = cv2.bitwise_and(image, image, mask = mask)
+
+        #for row in range (250, 400):
+        #    output[row] = np.where(output[row]!=[0,0,0],[255,255,255],output[row])
+            
+        top_indx_avg = 0
+        bot_indx_avg = 0
+
+        count = 0
+        arr_indx = np.where(output[380] != [0,0,0])
+        for i in arr_indx[0]:
+            bot_indx_avg += i
+            count += 1
+        bot_indx_avg /= count
+
+        count = 0
+        arr_indx = np.where(output[280] != [0,0,0])
+        for i in arr_indx[0]:
+            top_indx_avg += i
+            count += 1
+        top_indx_avg /= count
         
-        for row in range (340, 380):
-            output[row] = np.where(output[row]!=[0,0,0],[130,50,50],output[row])          
-        
+        #Controlador P
+        #self.motors.sendV(10)
+        #self.motors.sendW(-5)
+        R = 1.0
+        Y = top_indx_avg - bot_indx_avg
+        err = R - Y
+
+        print Y
+        print err
+
+        Kp = 0.55 #100%/Max err
+
+        W_max = 1.0
+        control = (-Kp*err)/100 # % de acción sobre W
+        print("control")
+        print control
+        print("---")
+
+        self.motors.sendW(W_max*control)
+        self.motors.sendV(3)
+
+
         self.set_threshold_image(output)
