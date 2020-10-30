@@ -9,6 +9,7 @@ import cv2
 import numpy as np
 
 time_cycle = 80
+last_err = 0
 
 class MyAlgorithm(threading.Thread):
 
@@ -84,57 +85,35 @@ class MyAlgorithm(threading.Thread):
         self.kill_event.set()
 
     def algorithm(self):
+        # last_err, es la variable que guarda el error anterior
+        global last_err
         image = self.getImage()
 
-        #Convert RGB --> HSV
+        # Filtro de imagen HSV
         hsv_image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
-
-        lower = np.array([0, 70, 50], dtype = "uint8")
-        upper = np.array([10, 255, 255], dtype = "uint8")
-
+        lower = np.array([0, 145, 0], dtype = "uint8")
+        upper = np.array([179, 255, 255], dtype = "uint8")
         mask = cv2.inRange(hsv_image, lower, upper)
-        output = cv2.bitwise_and(image, image, mask = mask)
 
-        #for row in range (250, 400):
-        #    output[row] = np.where(output[row]!=[0,0,0],[255,255,255],output[row])
-            
-        top_indx_avg = 0
-        bot_indx_avg = 0
+        # Centroide de mask
+        ret,thresh = cv2.threshold(mask,127,255,0)
+        M = cv2.moments(thresh)
+        cX = int(M["m10"] / M["m00"])
+        cY = int(M["m01"] / M["m00"])
+        cv2.circle(mask, (cX, cY), 20, (0, 0, 255), -1)
 
-        count = 0
-        arr_indx = np.where(output[380] != [0,0,0])
-        for i in arr_indx[0]:
-            bot_indx_avg += i
-            count += 1
-        bot_indx_avg /= count
+        # Offset del sensor
+        line_center = (mask.shape[0]/2) + 77
 
-        count = 0
-        arr_indx = np.where(output[280] != [0,0,0])
-        for i in arr_indx[0]:
-            top_indx_avg += i
-            count += 1
-        top_indx_avg /= count
+        # Controlador PD
+        err = cX - line_center
+        Kp = 0.575
+        Kd = 1.0
+        control = ((-Kp*err)-(Kd*(err - last_err)))/100
+        self.motors.sendW(control)
+        self.motors.sendV(5)
+        last_err = err
         
-        #Controlador P
-        #self.motors.sendV(10)
-        #self.motors.sendW(-5)
-        R = 1.0
-        Y = top_indx_avg - bot_indx_avg
-        err = R - Y
-
-        print Y
-        print err
-
-        Kp = 0.55 #100%/Max err
-
-        W_max = 1.0
-        control = (-Kp*err)/100 # % de acción sobre W
-        print("control")
-        print control
-        print("---")
-
-        self.motors.sendW(W_max*control)
-        self.motors.sendV(3)
-
-
-        self.set_threshold_image(output)
+        # Display de variable de control y de mask
+        print("Control --> {}").format(control)
+        self.set_threshold_image(mask)
